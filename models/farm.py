@@ -9,7 +9,7 @@ class PlantZone(Base):
     name = Column(String)
     location = Column(String)
     
-    logs = relationship("SensorLog", back_populates="zone")
+    logs = relationship("SensorLog", back_populates="zone", cascade="all, delete-orphan")
 
 class SensorLog(Base):
     __tablename__ = "sensor_logs"
