@@ -6,7 +6,7 @@ import schemas.farm_schema as schemas
 from database import get_db
 from routers.auth_router import get_current_user
 
-router = APIRouter(prefix="/farm", tags=["Manajemen Lahan & Sensor"])
+router = APIRouter(prefix="/farm")
 
 # ============================================================
 #  CRUD ZONA TANAMAN (PlantZone) — Create, Read, Update, Delete
@@ -17,7 +17,8 @@ router = APIRouter(prefix="/farm", tags=["Manajemen Lahan & Sensor"])
     response_model=schemas.PlantZone,
     status_code=status.HTTP_201_CREATED,
     summary="Tambah Zona Baru",
-    description="Membuat zona tanaman baru. Membutuhkan autentikasi JWT."
+    description="Membuat zona tanaman baru. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Zona Lahan"]
 )
 def create_zone(zone: schemas.PlantZoneCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_zone = models.PlantZone(name=zone.name, location=zone.location)
@@ -31,7 +32,8 @@ def create_zone(zone: schemas.PlantZoneCreate, db: Session = Depends(get_db), cu
     "/zones/",
     response_model=List[schemas.PlantZone],
     summary="Lihat Semua Zona",
-    description="Mengambil daftar semua zona tanaman beserta log sensor terkait. Membutuhkan autentikasi JWT."
+    description="Mengambil daftar semua zona tanaman beserta log sensor terkait. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Zona Lahan"]
 )
 def read_zones(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     return db.query(models.PlantZone).all()
@@ -41,7 +43,8 @@ def read_zones(db: Session = Depends(get_db), current_user=Depends(get_current_u
     "/zones/{zone_id}",
     response_model=schemas.PlantZone,
     summary="Lihat Zona berdasarkan ID",
-    description="Mengambil detail satu zona tanaman beserta log sensor terkait berdasarkan ID. Membutuhkan autentikasi JWT."
+    description="Mengambil detail satu zona tanaman beserta log sensor terkait berdasarkan ID. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Zona Lahan"]
 )
 def read_zone(zone_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_zone = db.query(models.PlantZone).filter(models.PlantZone.id == zone_id).first()
@@ -54,7 +57,8 @@ def read_zone(zone_id: int, db: Session = Depends(get_db), current_user=Depends(
     "/zones/{zone_id}",
     response_model=schemas.PlantZone,
     summary="Update Data Zona",
-    description="Mengupdate nama dan lokasi zona tanaman berdasarkan ID. Membutuhkan autentikasi JWT."
+    description="Mengupdate nama dan lokasi zona tanaman berdasarkan ID. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Zona Lahan"]
 )
 def update_zone(zone_id: int, zone: schemas.PlantZoneUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_zone = db.query(models.PlantZone).filter(models.PlantZone.id == zone_id).first()
@@ -71,7 +75,8 @@ def update_zone(zone_id: int, zone: schemas.PlantZoneUpdate, db: Session = Depen
     "/zones/{zone_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Hapus Zona",
-    description="Menghapus zona tanaman beserta semua log sensor terkait (cascade delete). Membutuhkan autentikasi JWT."
+    description="Menghapus zona tanaman beserta semua log sensor terkait (cascade delete). Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Zona Lahan"]
 )
 def delete_zone(zone_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_zone = db.query(models.PlantZone).filter(models.PlantZone.id == zone_id).first()
@@ -91,7 +96,8 @@ def delete_zone(zone_id: int, db: Session = Depends(get_db), current_user=Depend
     response_model=schemas.SensorLog,
     status_code=status.HTTP_201_CREATED,
     summary="Tambah Log Sensor ke Zona",
-    description="Menambahkan data log sensor (suhu & kelembapan) ke zona tertentu. Membutuhkan autentikasi JWT."
+    description="Menambahkan data log sensor (suhu & kelembapan) ke zona tertentu. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Sensor Log"]
 )
 def create_log_for_zone(zone_id: int, log: schemas.SensorLogCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_zone = db.query(models.PlantZone).filter(models.PlantZone.id == zone_id).first()
@@ -108,7 +114,8 @@ def create_log_for_zone(zone_id: int, log: schemas.SensorLogCreate, db: Session 
     "/zones/{zone_id}/logs/",
     response_model=List[schemas.SensorLog],
     summary="Lihat Semua Log Sensor per Zona",
-    description="Mengambil daftar semua log sensor yang tercatat pada zona tertentu. Membutuhkan autentikasi JWT."
+    description="Mengambil daftar semua log sensor yang tercatat pada zona tertentu. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Sensor Log"]
 )
 def read_logs_by_zone(zone_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_zone = db.query(models.PlantZone).filter(models.PlantZone.id == zone_id).first()
@@ -121,7 +128,8 @@ def read_logs_by_zone(zone_id: int, db: Session = Depends(get_db), current_user=
     "/logs/{log_id}",
     response_model=schemas.SensorLog,
     summary="Lihat Log Sensor berdasarkan ID",
-    description="Mengambil detail satu log sensor berdasarkan ID. Membutuhkan autentikasi JWT."
+    description="Mengambil detail satu log sensor berdasarkan ID. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Sensor Log"]
 )
 def read_log(log_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_log = db.query(models.SensorLog).filter(models.SensorLog.id == log_id).first()
@@ -134,7 +142,8 @@ def read_log(log_id: int, db: Session = Depends(get_db), current_user=Depends(ge
     "/logs/{log_id}",
     response_model=schemas.SensorLog,
     summary="Update Log Sensor",
-    description="Mengupdate data suhu dan kelembapan pada log sensor berdasarkan ID. Membutuhkan autentikasi JWT."
+    description="Mengupdate data suhu dan kelembapan pada log sensor berdasarkan ID. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Sensor Log"]
 )
 def update_log(log_id: int, log: schemas.SensorLogUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_log = db.query(models.SensorLog).filter(models.SensorLog.id == log_id).first()
@@ -151,7 +160,8 @@ def update_log(log_id: int, log: schemas.SensorLogUpdate, db: Session = Depends(
     "/logs/{log_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Hapus Log Sensor",
-    description="Menghapus satu log sensor berdasarkan ID. Membutuhkan autentikasi JWT."
+    description="Menghapus satu log sensor berdasarkan ID. Membutuhkan autentikasi JWT.",
+    tags=["Manajemen Sensor Log"]
 )
 def delete_log(log_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
     db_log = db.query(models.SensorLog).filter(models.SensorLog.id == log_id).first()

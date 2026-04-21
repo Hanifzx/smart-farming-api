@@ -1,0 +1,341 @@
+{
+	"info": {
+		"_postman_id": "smart-farming-api-collection",
+		"name": "UTS_PWL_SmartFarming_H071241033",
+		"description": "API untuk monitoring kelembapan dan nutrisi tanaman berbasis zona.\n\nSmart Farming API - FastAPI\nVersion: 1.0.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"testuser\",\n\t\"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Mendaftarkan user baru dengan username unik dan password yang di-hash menggunakan bcrypt.\n\n**Body (JSON):**\n- `username` (string, min 3, max 50 karakter)\n- `password` (string, min 6, max 100 karakter)"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has access_token\", function () {",
+									"    pm.expect(jsonData).to.have.property(\"access_token\");",
+									"});",
+									"",
+									"// Simpan token ke collection variable secara otomatis",
+									"if (jsonData.access_token) {",
+									"    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+									"    console.log(\"Token berhasil disimpan!\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "testuser",
+									"description": "Username yang sudah terdaftar",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password123",
+									"description": "Password user",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Autentikasi user dengan username dan password. Mengembalikan JWT access token jika berhasil.\n\n**Body (x-www-form-urlencoded):**\n- `username` (string)\n- `password` (string)\n\n**Tests Script:** Otomatis menyimpan `access_token` dari response ke variabel koleksi `token`."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoint untuk registrasi dan login user. Login menggunakan OAuth2PasswordRequestForm (x-www-form-urlencoded)."
+		},
+		{
+			"name": "Manajemen Zona Lahan",
+			"item": [
+				{
+					"name": "Get All Zones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/farm/zones/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"farm",
+								"zones",
+								""
+							]
+						},
+						"description": "Mengambil daftar semua zona tanaman beserta log sensor terkait. Membutuhkan autentikasi JWT."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Zone",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Zona Tomat A1\",\n\t\"location\": \"Greenhouse Utara\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/farm/zones/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"farm",
+								"zones",
+								""
+							]
+						},
+						"description": "Membuat zona tanaman baru. Membutuhkan autentikasi JWT.\n\n**Body (JSON):**\n- `name` (string, min 1, max 100 karakter) - Nama zona tanaman\n- `location` (string, min 1, max 200 karakter) - Lokasi zona"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Zone",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Zona Tomat A1 (Updated)\",\n\t\"location\": \"Greenhouse Selatan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/farm/zones/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"farm",
+								"zones",
+								"1"
+							]
+						},
+						"description": "Mengupdate nama dan lokasi zona tanaman berdasarkan ID. Membutuhkan autentikasi JWT.\n\n**Path Parameter:**\n- `zone_id` (integer) - ID zona yang akan diupdate\n\n**Body (JSON):**\n- `name` (string) - Nama zona baru\n- `location` (string) - Lokasi zona baru"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Zone",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/farm/zones/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"farm",
+								"zones",
+								"1"
+							]
+						},
+						"description": "Menghapus zona tanaman beserta semua log sensor terkait (cascade delete). Membutuhkan autentikasi JWT.\n\n**Path Parameter:**\n- `zone_id` (integer) - ID zona yang akan dihapus"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operasi untuk zona tanaman (PlantZone). Semua endpoint membutuhkan autentikasi JWT Bearer Token."
+		},
+		{
+			"name": "Manajemen Sensor Log",
+			"item": [
+				{
+					"name": "Create Sensor Log",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"temperature\": 28.5,\n\t\"humidity\": 75.0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/farm/zones/1/logs/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"farm",
+								"zones",
+								"1",
+								"logs",
+								""
+							]
+						},
+						"description": "Menambahkan data log sensor (suhu & kelembapan) ke zona tertentu. Membutuhkan autentikasi JWT.\n\n**Path Parameter:**\n- `zone_id` (integer) - ID zona target\n\n**Body (JSON):**\n- `temperature` (float, -50 s/d 60) - Suhu dalam Celsius\n- `humidity` (float, 0 s/d 100) - Kelembapan dalam persen"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sensor Logs by Zone",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/farm/zones/1/logs/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"farm",
+								"zones",
+								"1",
+								"logs",
+								""
+							]
+						},
+						"description": "Mengambil daftar semua log sensor yang tercatat pada zona tertentu. Membutuhkan autentikasi JWT.\n\n**Path Parameter:**\n- `zone_id` (integer) - ID zona yang ingin dilihat log-nya"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Sensor Log",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/farm/logs/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"farm",
+								"logs",
+								"1"
+							]
+						},
+						"description": "Menghapus satu log sensor berdasarkan ID. Membutuhkan autentikasi JWT.\n\n**Path Parameter:**\n- `log_id` (integer) - ID log sensor yang akan dihapus"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operasi untuk log sensor (SensorLog). Semua endpoint membutuhkan autentikasi JWT Bearer Token."
+		}
+	]
+}
